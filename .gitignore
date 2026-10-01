@@ -1,4 +1,4 @@
-﻿# =============================================================
+# =============================================================
 # SLM Project — .gitignore
 # =============================================================
 
@@ -101,3 +101,10 @@ mlartifacts/
 
 # --- Profiling ---
 *.prof
+
+# --- Project Progress Checkpoints (local tracking, never push to git) ---
+CHECKPOINTS.md
+PROGRESS_CHECKPOINTS.md
+.project_checkpoint*
+checkpoints_tracker.*
+
