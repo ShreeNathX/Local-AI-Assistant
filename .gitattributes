@@ -1,0 +1,27 @@
+﻿# Normalize line endings
+* text=auto eol=lf
+
+# Python
+*.py text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+
+# Windows scripts
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binaries — no line-ending conversion
+*.pt binary
+*.pth binary
+*.ckpt binary
+*.bin binary
+*.safetensors binary
+*.model binary
+*.pkl binary
+*.gz binary

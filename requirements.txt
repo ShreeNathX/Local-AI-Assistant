@@ -1,0 +1,59 @@
+﻿# =============================================================
+# SLM Project — requirements.txt
+# Core runtime dependencies — pinned for reproducibility.
+#
+# PyTorch is installed separately via pip with the CUDA index.
+# See: scripts/install_env.ps1
+# Do NOT add torch/torchvision here — versions are managed
+# through the CUDA-specific wheel index.
+# =============================================================
+
+# --- Numeric & Array Processing ---
+numpy>=1.26.4,<3.0.0
+
+# --- Tokenization ---
+tokenizers>=0.20.4,<1.0.0
+sentencepiece>=0.2.0,<1.0.0
+
+# --- HuggingFace Ecosystem (used for datasets and tokenizer utils) ---
+transformers>=4.47.0,<5.0.0
+datasets>=3.2.0,<4.0.0
+huggingface-hub>=0.27.0,<1.0.0
+
+# --- Configuration Management ---
+pyyaml>=6.0.2,<7.0.0
+python-dotenv>=1.0.1,<2.0.0
+
+# --- Logging ---
+loguru>=0.7.3,<1.0.0
+
+# --- Terminal / Progress ---
+rich>=13.9.4,<14.0.0
+tqdm>=4.67.1,<5.0.0
+
+# --- System Monitoring ---
+psutil>=6.1.1,<7.0.0
+gputil>=1.4.0,<2.0.0
+
+# --- Vector Search (RAG) ---
+faiss-cpu>=1.9.0
+
+# --- Web & HTTP ---
+httpx>=0.28.1,<1.0.0
+requests>=2.32.3,<3.0.0
+
+# --- API ---
+fastapi>=0.115.6,<1.0.0
+uvicorn[standard]>=0.34.0,<1.0.0
+pydantic>=2.10.5,<3.0.0
+
+# --- Data Utilities ---
+ftfy>=6.3.1,<7.0.0
+langdetect>=1.0.9,<2.0.0
+regex>=2024.11.6
+
+# --- Hashing & Deduplication ---
+datasketch>=1.6.5,<2.0.0
+
+# --- Experiment Tracking ---
+tensorboard>=2.18.0,<3.0.0

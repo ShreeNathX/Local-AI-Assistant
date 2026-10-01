@@ -1,0 +1,47 @@
+﻿# =============================================================
+# SLM Project — Tiny Model Configuration
+# configs/model_tiny.yaml
+#
+# Purpose: Pipeline validation only.
+# NOT for performance — for verifying:
+#   - Model architecture
+#   - Forward pass
+#   - Backward pass
+#   - Loss computation
+#   - Checkpointing
+#   - GPU training
+#
+# Target: ~5M parameters
+# =============================================================
+
+model:
+  name: "slm-tiny"
+  version: "0.1.0"
+  architecture: "decoder-only-transformer"
+
+  # --- Dimensions ---
+  vocab_size: 16384        # will be overridden by tokenizer vocab size
+  context_length: 512      # max sequence length
+  d_model: 256             # embedding / hidden dimension
+  n_layers: 4              # number of transformer blocks
+  n_heads: 4               # attention heads (d_model / n_heads = 64)
+  d_ffn: 1024              # feed-forward dimension (4 * d_model)
+  dropout: 0.1
+
+  # --- Positional Encoding ---
+  pos_encoding: "rope"     # rope | learned | sinusoidal
+  rope_theta: 10000.0      # RoPE base frequency
+
+  # --- Normalization ---
+  norm_type: "rmsnorm"     # rmsnorm | layernorm
+  norm_eps: 1.0e-5
+
+  # --- Attention ---
+  attention_type: "causal" # causal (decoder-only, no look-ahead)
+  bias: false              # no bias in attention / FFN (GPT-NeoX style)
+
+  # --- Weight Initialization ---
+  init_std: 0.02
+
+  # --- LM Head ---
+  tie_embeddings: true     # tie input embedding weights to output LM head

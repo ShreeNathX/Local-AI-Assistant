@@ -1,0 +1,33 @@
+﻿# =============================================================
+# SLM Project — 50M Model Configuration
+# configs/model_50m.yaml
+#
+# Target: ~50M parameters
+# Hardware requirement: >= 4 GB VRAM (fp16)
+# Suitable for: GTX 1650 (4 GB) with gradient accumulation
+# =============================================================
+
+model:
+  name: "slm-50m"
+  version: "0.1.0"
+  architecture: "decoder-only-transformer"
+
+  vocab_size: 32000        # will be overridden by tokenizer
+  context_length: 1024
+  d_model: 512
+  n_layers: 8
+  n_heads: 8               # head_dim = 64
+  d_ffn: 2048              # 4 * d_model
+  dropout: 0.1
+
+  pos_encoding: "rope"
+  rope_theta: 10000.0
+
+  norm_type: "rmsnorm"
+  norm_eps: 1.0e-5
+
+  attention_type: "causal"
+  bias: false
+
+  init_std: 0.02
+  tie_embeddings: true

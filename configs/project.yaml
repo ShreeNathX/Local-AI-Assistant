@@ -1,0 +1,46 @@
+﻿# =============================================================
+# SLM Project — Project Configuration
+# configs/project.yaml
+#
+# RULES:
+#   - Do NOT hardcode any of these values in source code.
+#   - All paths are relative to project root unless absolute.
+#   - Override any value via environment variables prefixed
+#     with SLM_ (e.g., SLM_SEED=123).
+# =============================================================
+
+project:
+  name: "slm-project"
+  version: "0.1.0"
+  description: "Small Language Model built from scratch"
+  author: ""
+
+# --- Reproducibility ---
+seed: 42
+
+# --- Directory Layout ---
+paths:
+  data_root:        "data"
+  raw_data:         "data/raw"
+  interim_data:     "data/interim"
+  processed_data:   "data/processed"
+  validation_dir:   "data/validation"
+  licenses_dir:     "data/licenses"
+  tokenizer_dir:    "tokenizer/artifacts"
+  checkpoint_dir:   "checkpoints"
+  logs_dir:         "logs"
+  eval_dir:         "evaluation/results"
+
+# --- Logging ---
+logging:
+  level: "INFO"          # DEBUG | INFO | WARNING | ERROR | CRITICAL
+  format: "json"         # json | text
+  rotation: "10 MB"      # loguru rotation
+  retention: "30 days"
+
+# --- Hardware ---
+hardware:
+  device: "auto"         # auto | cuda | cpu
+  # auto: use CUDA if available, fallback to CPU
+  num_workers: 4         # DataLoader workers (set to 0 on Windows if issues)
+  pin_memory: true       # true if CUDA available
