@@ -7,6 +7,7 @@ schema      Standard document and dataset manifest schemas.
 sources     Corpus source configurations and licensing registry.
 collector   Streaming data ingestion and sampling.
 filter      Quality filters, heuristics, and toxicity/dedup filters.
+dataset     Memory-mapped binary token dataset and packing engine.
 """
 
 from slm.data.schema import (
@@ -37,6 +38,11 @@ from slm.data.filter import (
     compute_repetition_ratio,
     filter_and_clean_stream,
 )
+from slm.data.dataset import (
+    BinaryTokenWriter,
+    PretrainingDataset,
+    pack_corpus_to_binary,
+)
 
 __all__ = [
     "Document",
@@ -59,4 +65,7 @@ __all__ = [
     "clean_text",
     "compute_repetition_ratio",
     "filter_and_clean_stream",
+    "BinaryTokenWriter",
+    "PretrainingDataset",
+    "pack_corpus_to_binary",
 ]
