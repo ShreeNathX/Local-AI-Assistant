@@ -29,6 +29,14 @@ from slm.data.collector import (
     StreamingHFCollector,
     SyntheticOverfitCollector,
 )
+from slm.data.filter import (
+    Deduplicator,
+    FilterConfig,
+    QualityFilter,
+    clean_text,
+    compute_repetition_ratio,
+    filter_and_clean_stream,
+)
 
 __all__ = [
     "Document",
@@ -45,4 +53,10 @@ __all__ = [
     "LocalFileCollector",
     "StreamingHFCollector",
     "SyntheticOverfitCollector",
+    "FilterConfig",
+    "QualityFilter",
+    "Deduplicator",
+    "clean_text",
+    "compute_repetition_ratio",
+    "filter_and_clean_stream",
 ]
