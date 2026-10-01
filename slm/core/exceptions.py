@@ -1,4 +1,4 @@
-﻿"""
+"""
 slm/core/exceptions.py
 ======================
 All project-specific exceptions.
@@ -149,6 +149,11 @@ class DataValidationError(DataError):
 
 class DataVersionError(DataError):
     """Raised when dataset version tags are missing or incompatible."""
+
+
+class DataCollectionError(DataError):
+    """Raised when data collection or streaming ingestion fails."""
+
 
 
 # ---------------------------------------------------------------------------

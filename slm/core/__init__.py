@@ -1,4 +1,4 @@
-﻿"""
+"""
 slm.core — Core infrastructure for the SLM project.
 
 Modules
@@ -28,7 +28,9 @@ from slm.core.exceptions import (
     DataFileNotFoundError,
     DataCorruptedError,
     DataValidationError,
+    DataCollectionError,
     TokenizerError,
+
     TokenizerNotFoundError,
     ModelError,
     CheckpointNotFoundError,
@@ -65,7 +67,9 @@ __all__ = [
     "DataFileNotFoundError",
     "DataCorruptedError",
     "DataValidationError",
+    "DataCollectionError",
     "TokenizerError",
+
     "TokenizerNotFoundError",
     "ModelError",
     "CheckpointNotFoundError",
