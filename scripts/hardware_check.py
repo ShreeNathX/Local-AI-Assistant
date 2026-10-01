@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 SLM Project — Hardware Diagnostic Script
 =========================================
@@ -41,6 +41,14 @@ import textwrap
 import datetime
 from pathlib import Path
 from typing import Any
+
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 # ---------------------------------------------------------------------------
 # Constants — minimum requirements
@@ -475,7 +483,7 @@ def run_diagnostics() -> dict[str, Any]:
             if vram >= threshold:
                 rec = label
         print(f"  {_bold('Model Recommendation based on VRAM:')}")
-        print(f"    VRAM: {vram:.1f} GB → Max practical model: {rec}")
+        print(f"    VRAM: {vram:.1f} GB -> Max practical model: {rec}")
         print()
     elif results.get("gpu", {}).get("data", {}).get("vram_gb"):
         vram = results["gpu"]["data"]["vram_gb"]
@@ -484,8 +492,9 @@ def run_diagnostics() -> dict[str, Any]:
             if vram >= threshold:
                 rec = label
         print(f"  {_bold('Model Recommendation based on VRAM (nvidia-smi):')}")
-        print(f"    VRAM: {vram:.1f} GB → Max practical model: {rec}")
+        print(f"    VRAM: {vram:.1f} GB -> Max practical model: {rec}")
         print()
+
 
     print(_bold("=" * 64))
     print()
