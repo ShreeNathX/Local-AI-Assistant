@@ -1,129 +1,68 @@
-﻿# SLM Project
+# SLM
 
-> A Small Language Model (SLM) built from scratch — for educational and engineering purposes.
+SLM is a local chat application for conversation and coding, with optional live web search. It uses Ollama's documented chat client and the Qwen2.5 1.5B instruction model. The model runs on your machine; web search uses the real `ddgs` metasearch library and requires an internet connection.
 
-## Project Status
+This project is the assistant application, not a newly trained foundation model. A useful model trained from random weights needs a large licensed dataset and substantial compute. SLM uses an existing open model so it can answer questions and write code immediately.
 
-| Phase | Name | Status |
-|---|---|---|
-| 0 | Requirements & Planning | PASSED |
-| 1 | Hardware & Environment Validation | IN PROGRESS |
-| 2 | Repository & Configuration | IN PROGRESS |
-| 3–28 | Subsequent phases | NOT STARTED |
+## Requirements
 
-## Quick Start
+- Windows, macOS, or Linux
+- Python 3.10 or newer
+- Ollama installed and running
+- About 1 GB of disk space for the default quantized model
 
-### 1. Prerequisites
+## Setup
 
-- Python 3.10+
-- NVIDIA GPU with CUDA support (recommended)
-- Git
+1. Install [Ollama](https://ollama.com/download) and start it.
+2. In a terminal, download the model:
 
-### 2. Clone and Set Up
+   ```sh
+   ollama pull qwen2.5:1.5b-instruct
+   ```
 
-```powershell
-git clone <repo-url>
-cd slm-project
+3. Create and activate a Python virtual environment in this project, then install the app dependencies:
 
-# Create virtual environment and install all dependencies
-powershell -ExecutionPolicy Bypass -File scripts\install_env.ps1
+   ```sh
+   python -m venv .venv
+   ```
 
-# Activate the environment
-.venv\Scripts\Activate.ps1
-```
+   Windows PowerShell:
 
-### 3. Copy environment configuration
+   ```powershell
+   .\.venv\Scripts\Activate.ps1
+   ```
 
-```powershell
-copy .env.example .env
-# Edit .env to add your API keys (optional for early phases)
-```
+   macOS or Linux:
 
-### 4. Run Hardware Check
+   ```sh
+   source .venv/bin/activate
+   ```
 
-```powershell
-python scripts/hardware_check.py --save-report
-```
+   Then, on any platform:
 
-Expected output (PASS on a CUDA-capable system):
-```
-[PASS]  Python           3.11.9
-[PASS]  GPU              NVIDIA GeForce GTX 1650 | 4.0 GB VRAM
-[PASS]  CUDA (PyTorch)   CUDA 12.1
-...
-Overall: PASS — Safe to proceed.
-```
+   ```sh
+   python -m pip install -r requirements.txt
+   streamlit run app.py
+   ```
 
-### 5. Run Tests
+4. Open the local address printed by Streamlit in your browser.
 
-```powershell
-# Install development dependencies first
-pip install -r requirements-dev.txt
+## Use
 
-# Run all unit tests
-pytest tests/unit/
+- **Conversation** answers general questions using the local model.
+- **Coding** biases responses toward code and software development.
+- **Web search** searches the internet for each message, gives the results to the model, and displays linked sources with the answer.
 
-# Run with coverage
-pytest tests/unit/ --cov=slm --cov-report=term-missing
-```
+The sidebar lets you change the Ollama model and server address. The defaults can also be set with `SLM_MODEL` and `OLLAMA_HOST` environment variables. Search queries are sent to DDGS search providers; conversation messages are sent only to the local Ollama server.
 
-## Repository Structure
+## Troubleshooting
 
-```
-slm-project/
-├── configs/         # YAML configuration files (model, training, tokenizer)
-├── data/            # Data pipeline (raw → interim → processed)
-├── slm/             # Importable Python package
-│   ├── core/        # Config, logging, exceptions
-│   ├── model/       # Transformer architecture (Phase 10+)
-│   ├── tokenizer/   # BPE tokenizer (Phase 9+)
-│   ├── training/    # Training loop (Phase 11+)
-│   ├── evaluation/  # Metrics and evaluation (Phase 15+)
-│   ├── inference/   # Text generation (Phase 13+)
-│   ├── tools/       # External tools: search, calculator (Phase 21+)
-│   ├── rag/         # Retrieval-augmented generation (Phase 23+)
-│   ├── router/      # Intent routing (Phase 24+)
-│   └── api/         # REST API (Phase 25+)
-├── scripts/         # Runnable scripts (hardware_check, install_env)
-├── tests/           # Unit, integration, regression tests
-├── docs/            # Documentation
-├── checkpoints/     # Model checkpoints (git-ignored)
-├── logs/            # Structured logs (git-ignored)
-└── tokenizer/       # Tokenizer training and artifacts
-```
+- If the model is unavailable, run `ollama pull qwen2.5:1.5b-instruct` and confirm Ollama is running.
+- If the Ollama address differs from `http://localhost:11434`, change it in the sidebar or set `OLLAMA_HOST`.
+- Web search needs internet access. Conversation and coding do not.
+- The 1.5B model is intentionally small. It can make mistakes, especially on complex code or reasoning tasks; review generated code before using it.
 
-## Development Rules
+## Main components
 
-1. **Never skip a phase** — every phase must PASS before the next begins.
-2. **Never ignore errors** — stop, diagnose, fix, re-test.
-3. **Never invent results** — all metrics must be measured.
-4. **Fail fast** — missing files, bad configs, and wrong types raise exceptions immediately.
-5. **Raw data is immutable** — never modify files in `data/raw/`.
-
-## Hardware Requirements
-
-| Component | Minimum | Recommended |
-|---|---|---|
-| Python | 3.10 | 3.11+ |
-| RAM | 8 GB | 16 GB |
-| GPU VRAM | 4 GB | 8+ GB |
-| Disk | 50 GB free | 200+ GB free |
-| CUDA | 11.8 | 12.1+ |
-
-## Phase Gate Definition of Done
-
-A phase is only PASSED when:
-- [ ] Implementation committed to git
-- [ ] Unit tests pass
-- [ ] Integration tests pass (where applicable)
-- [ ] Smoke test passes
-- [ ] Validation report generated
-- [ ] Errors handled (no bare `except`)
-- [ ] Structured logs confirmed
-- [ ] Output artifact versioned
-- [ ] Reproducibility confirmed (fixed seed)
-- [ ] Documentation updated
-
-## License
-
-This project is for educational purposes. All training data must be used in compliance with their respective licenses. See `data/licenses/` for details.
+- `app.py`: chat interface, conversation context, model calls, and search results.
+- `requirements.txt`: the three runtime dependencies.
