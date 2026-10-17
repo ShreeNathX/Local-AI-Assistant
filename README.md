@@ -1,68 +1,60 @@
-# SLM
+# Local AI Assistant
 
-SLM is a local chat application for conversation and coding, with optional live web search. It uses Ollama's documented chat client and the Qwen2.5 1.5B instruction model. The model runs on your machine; web search uses the real `ddgs` metasearch library and requires an internet connection.
+A small Streamlit assistant for conversation, coding help, and current web search. The model runs on the machine hosting the app. It does not use Ollama or a paid inference API.
 
-This project is the assistant application, not a newly trained foundation model. A useful model trained from random weights needs a large licensed dataset and substantial compute. SLM uses an existing open model so it can answer questions and write code immediately.
+## Model and how this app was built
 
-## Requirements
+This project does not train a language model from scratch. It uses Qwen2.5-Coder-1.5B-Instruct, an existing instruction-tuned model with 1.54 billion parameters and general conversation and coding capabilities. The app downloads the official Q4_K_M GGUF version from Hugging Face on first use. Quantization reduces the model file to about 1.12 GB so it can run with the CPU-based `llama.cpp` runtime. The model weights are not stored in this GitHub repository.
 
-- Windows, macOS, or Linux
-- Python 3.10 or newer
-- Ollama installed and running
-- About 1 GB of disk space for the default quantized model
+The model was not trained or fine-tuned in Jupyter. Jupyter is optional for a future fine-tuning project; it is not needed to run this app. The current project connects the pretrained model to a Streamlit chat interface through `llama-cpp-python`. For coding and web-search requests, it retrieves a small set of web results, gives their text to the model, and displays the source links. Search uses the real `ddgs` package. No training dataset or notebook is required to run the current app.
 
-## Setup
+The base model is published under Apache-2.0. Review the [Qwen model card](https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct) and [official GGUF repository](https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF) for model details and terms.
 
-1. Install [Ollama](https://ollama.com/download) and start it.
-2. In a terminal, download the model:
+## Deploy from GitHub to Streamlit Community Cloud
 
-   ```sh
-   ollama pull qwen2.5:1.5b-instruct
-   ```
+1. Push this repository to GitHub. Keep virtual environments and model weights out of the repository; `.gitignore` excludes local environments and secrets.
+2. Open [Streamlit Community Cloud](https://share.streamlit.io/) and create an app from the GitHub repository.
+3. Select the branch and `app.py` as the app file.
+4. In advanced settings, select Python 3.12, then deploy.
+5. The first request downloads the model. Allow time and disk space for the roughly 1.1 GB download.
 
-3. Create and activate a Python virtual environment in this project, then install the app dependencies:
+Community Cloud runs the model on its Linux host, not on each visitor's computer. Its resource limits vary; the model plus runtime may exceed the memory available to an app, so a successful deployment cannot be guaranteed on every Community Cloud allocation. If it runs out of memory or is too slow, host the same app on a machine with more RAM or use the local setup below. See [Streamlit's resource limits](https://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app#app-resources-and-limits).
 
-   ```sh
-   python -m venv .venv
-   ```
+## Run locally
 
-   Windows PowerShell:
+Requirements: 64-bit Windows, macOS, or Linux; Python 3.10 or newer; 8 GB RAM recommended; and about 2 GB of free disk space. Internet is needed to install packages, download the model the first time, and search the web.
 
-   ```powershell
-   .\.venv\Scripts\Activate.ps1
-   ```
+Create and activate a virtual environment:
 
-   macOS or Linux:
+```sh
+python -m venv .slm-venv
+```
 
-   ```sh
-   source .venv/bin/activate
-   ```
+Windows PowerShell:
 
-   Then, on any platform:
+```powershell
+.\.slm-venv\Scripts\Activate.ps1
+```
 
-   ```sh
-   python -m pip install -r requirements.txt
-   streamlit run app.py
-   ```
+macOS or Linux:
 
-4. Open the local address printed by Streamlit in your browser.
+```sh
+source .slm-venv/bin/activate
+```
 
-## Use
+Install the dependencies and start the app:
 
-- **Conversation** answers general questions using the local model.
-- **Coding** biases responses toward code and software development.
-- **Web search** searches the internet for each message, gives the results to the model, and displays linked sources with the answer.
+```sh
+python -m pip install -r requirements.txt
+streamlit run app.py
+```
 
-The sidebar lets you change the Ollama model and server address. The defaults can also be set with `SLM_MODEL` and `OLLAMA_HOST` environment variables. Search queries are sent to DDGS search providers; conversation messages are sent only to the local Ollama server.
+The model is cached by Hugging Face after its first download. Conversation and coding generation can then run offline; web search still needs internet access.
 
-## Troubleshooting
+## Modes and limitations
 
-- If the model is unavailable, run `ollama pull qwen2.5:1.5b-instruct` and confirm Ollama is running.
-- If the Ollama address differs from `http://localhost:11434`, change it in the sidebar or set `OLLAMA_HOST`.
-- Web search needs internet access. Conversation and coding do not.
-- The 1.5B model is intentionally small. It can make mistakes, especially on complex code or reasoning tasks; review generated code before using it.
+- **Conversation:** responds using the local model without searching the web.
+- **Coding:** searches for relevant documentation and provides source links with the generated code.
+- **Web search:** searches the current question and answers using the retrieved results.
 
-## Main components
-
-- `app.py`: chat interface, conversation context, model calls, and search results.
-- `requirements.txt`: the three runtime dependencies.
+Search results help with current information but do not guarantee that generated code is correct or identical to an example. Check cited documentation and review code before using it. The model is small, so it may struggle with complex or lengthy tasks.
