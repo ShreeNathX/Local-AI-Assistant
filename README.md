@@ -1,5 +1,7 @@
 # Local AI Assistant
 
+[Try the live app](https://local-ai-assistant-by-snm.streamlit.app/)
+
 A small Streamlit assistant for conversation, coding help, and current web search. The model runs on the machine hosting the app. It does not use Ollama or a paid inference API.
 
 ## Model and how this app was built
