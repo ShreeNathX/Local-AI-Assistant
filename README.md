@@ -22,6 +22,10 @@ The base model is published under Apache-2.0. Review the [Qwen model card](https
 
 In the app, select **RAG** and upload a PDF, DOCX, TXT, Markdown, or CSV file to ask questions about it. Uploads are limited to 10 MB and 250,000 extracted characters. Retrieved passages are shown with each answer so you can verify the citations. Scanned/image-only PDFs are not supported because this version does not include OCR. Since retrieval uses keyword relevance, rephrase a question with terms from the document if no relevant passage is found. The model can still make mistakes; verify the quoted passages for exact wording.
 
+## Context window
+
+The sidebar context setting ranges from 2,048 to 8,192 tokens, with 4,096 as the default. The model's input budget grows with that setting while reserving room for a response. In RAG mode, larger contexts can also include more retrieved passages. A larger context does not make the model more knowledgeable or guarantee more accurate answers. It uses more memory and can slow generation; on Streamlit Community Cloud it may exceed the app's memory allocation. Changing the setting reloads the model configuration, while the downloaded model file remains cached. The app keeps recent chat history until the selected input budget is reached, warns as the conversation approaches that limit, and offers a **Continue answer** button when a reply reaches its output limit.
+
 Uploaded documents are processed by the machine hosting the app and their text is included in model prompts. Do not upload sensitive files to a public deployment.
 
 Community Cloud runs the model on its Linux host, not on each visitor's computer. Its resource limits vary; the model plus runtime may exceed the memory available to an app, so a successful deployment cannot be guaranteed on every Community Cloud allocation. If it runs out of memory or is too slow, host the same app on a machine with more RAM or use the local setup below. See [Streamlit's resource limits](https://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app#app-resources-and-limits).
@@ -55,13 +59,11 @@ python -m pip install -r requirements.txt
 streamlit run app.py
 ```
 
-The model is cached by Hugging Face after its first download. Conversation and coding generation can then run offline; web search still needs internet access.
+The model is cached by Hugging Face after its first download. In Assistant mode, ordinary conversation can run offline. Coding and current-information requests try web search first; if search is unavailable, the assistant explains that the answer was not verified online. RAG document processing and answering use the local model, but the first model download needs internet access.
 
 ## Modes and limitations
 
-- **Conversation:** responds using the local model without searching the web.
-- **Coding:** searches for relevant documentation and provides source links with the generated code.
-- **Web search:** searches the current question and answers using the retrieved results.
+- **Assistant:** handles conversation, coding, and web search in one mode. It searches documentation for coding requests and the web when the prompt signals that current information is needed. It answers ordinary conversation directly.
 - **RAG:** answers using passages retrieved from the uploaded file and displays those passages for checking.
 
 Search results help with current information but do not guarantee that generated code is correct or identical to an example. Check cited documentation and review code before using it. The model is small, so it may struggle with complex or lengthy tasks.
