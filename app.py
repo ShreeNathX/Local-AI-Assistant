@@ -41,6 +41,15 @@ SEARCH_INTENT = re.compile(
     r"recent|news|weather|price|release date|as of now|official source|documentation)\b",
     re.IGNORECASE,
 )
+SENSITIVE_CREDENTIAL = re.compile(
+    r"-----BEGIN [A-Z ]*PRIVATE KEY-----|"
+    r"\b(?:AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9_]{20,}|xox[baprs]-[A-Za-z0-9-]{20,}|"
+    r"sk-(?:proj-)?[A-Za-z0-9_-]{20,}|hf_[A-Za-z0-9]{20,}|AIza[0-9A-Za-z_-]{30,})\b|"
+    r"\bBearer\s+[A-Za-z0-9._~+/-]{20,}|"
+    r"\b(?:api[_ -]?key|access[_ -]?token|password|passwd|secret|authorization)"
+    r"\s*[:=]\s*[\"']?[^\s,\"']+",
+    re.IGNORECASE,
+)
 CODING_INTENT = re.compile(
     r"\b(code|coding|program|programming|python|javascript|typescript|java|c\+\+|"
     r"c#|rust|golang|sql|html|css|api|package|library|function|class|script|"
@@ -87,8 +96,12 @@ def search_web(
     return sources
 
 
+def contains_sensitive_credential(prompt: str) -> bool:
+    return bool(SENSITIVE_CREDENTIAL.search(prompt))
+
+
 def classify_assistant_request(prompt: str) -> tuple[str, bool]:
-    """Choose response style; Assistant mode always attempts web search."""
+    """Choose response style; Assistant mode searches unless a credential is present."""
     is_coding = bool(CODING_INTENT.search(prompt))
     needs_search = is_coding or bool(SEARCH_INTENT.search(prompt))
     if is_coding:
@@ -496,7 +509,9 @@ def main() -> None:
         if st.button("New conversation", width="stretch"):
             st.session_state.messages = []
             st.rerun()
-        st.caption("Assistant searches the web before every reply and falls back to the local model offline.")
+        st.caption(
+            "Assistant searches each message and skips web search when a credential is detected."
+        )
         st.caption("Runs on this app's host. First use downloads the model (about 1.1 GB).")
 
     document_chunks: list[dict[str, str | int | None]] = []
@@ -578,24 +593,29 @@ def main() -> None:
     retrieved_chunks: list[dict[str, str | int | None]] = []
     assistant_task, search_requested = classify_assistant_request(prompt)
     if mode == "Assistant" and search_requested:
-        query = prompt
         search_failed = False
-        if assistant_task == "Coding":
-            query += " official documentation example"
-        try:
-            source_limit = min(MAX_SEARCH_RESULTS, max(1, context_size // 1_024))
-            snippet_limit = max(250, min(1_000, context_size // 8))
-            with st.status("Searching the web", expanded=False):
-                sources = search_web(query, source_limit, snippet_limit)
-        except RuntimeError:
+        if contains_sensitive_credential(prompt):
             search_failed = True
             st.warning(
-                "Web search is unavailable. The local model will answer without current results."
+                "This message may contain a credential, so web search was skipped "
+                "to avoid sending it to the search provider. The local model will answer."
             )
         else:
-            search_failed = False
-        if not sources and not search_failed:
-            st.info("No web results were found. The local model will answer instead.")
+            query = prompt
+            if assistant_task == "Coding":
+                query += " official documentation example"
+            try:
+                source_limit = min(MAX_SEARCH_RESULTS, max(1, context_size // 1_024))
+                snippet_limit = max(250, min(1_000, context_size // 8))
+                with st.status("Searching the web", expanded=False):
+                    sources = search_web(query, source_limit, snippet_limit)
+            except RuntimeError:
+                search_failed = True
+                st.warning(
+                    "Web search is unavailable. The local model will answer without current results."
+                )
+            if not sources and not search_failed:
+                st.info("No web results were found. The local model will answer instead.")
     elif mode == "RAG":
         max_chunks = min(MAX_RETRIEVED_CHUNKS, max(1, context_size // 1_024))
         retrieved_chunks = retrieve_document_chunks(
