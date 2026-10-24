@@ -268,10 +268,11 @@ def make_messages(
     system_prompt = SYSTEM_PROMPT
     if mode == "Assistant" and assistant_task == "Coding":
         system_prompt += (
-            " Search the supplied documentation first, preferring official sources. "
-            "Produce a complete solution, "
-            "include necessary imports and setup, and cite the documentation used. "
-            "Do not invent APIs or package names."
+            " Produce a complete solution with necessary imports and setup. "
+            "When search results are supplied, prefer official documentation "
+            "and cite matching results. When no results are supplied, still answer "
+            "from your existing knowledge, state assumptions, and do not claim "
+            "online verification. Do not invent APIs or package names."
         )
     elif mode == "Assistant" and assistant_task == "Web search":
         system_prompt += " Answer the current question from the supplied search results."
