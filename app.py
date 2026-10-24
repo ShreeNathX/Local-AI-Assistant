@@ -88,13 +88,14 @@ def search_web(
 
 
 def classify_assistant_request(prompt: str) -> tuple[str, bool]:
+    """Choose response style; Assistant mode always attempts web search."""
     is_coding = bool(CODING_INTENT.search(prompt))
     needs_search = is_coding or bool(SEARCH_INTENT.search(prompt))
     if is_coding:
         return "Coding", True
     if needs_search:
         return "Web search", True
-    return "Conversation", False
+    return "Conversation", True
 
 
 def read_document_sections(file_name: str, file_bytes: bytes) -> list[tuple[int | None, str]]:
@@ -495,9 +496,7 @@ def main() -> None:
         if st.button("New conversation", width="stretch"):
             st.session_state.messages = []
             st.rerun()
-        st.caption(
-            "Assistant searches for coding requests and when an answer needs current information."
-        )
+        st.caption("Assistant searches the web before every reply and falls back to the local model offline.")
         st.caption("Runs on this app's host. First use downloads the model (about 1.1 GB).")
 
     document_chunks: list[dict[str, str | int | None]] = []
@@ -580,6 +579,7 @@ def main() -> None:
     assistant_task, search_requested = classify_assistant_request(prompt)
     if mode == "Assistant" and search_requested:
         query = prompt
+        search_failed = False
         if assistant_task == "Coding":
             query += " official documentation example"
         try:
@@ -588,7 +588,14 @@ def main() -> None:
             with st.status("Searching the web", expanded=False):
                 sources = search_web(query, source_limit, snippet_limit)
         except RuntimeError:
-            st.warning("Web search is unavailable. Answering without current results.")
+            search_failed = True
+            st.warning(
+                "Web search is unavailable. The local model will answer without current results."
+            )
+        else:
+            search_failed = False
+        if not sources and not search_failed:
+            st.info("No web results were found. The local model will answer instead.")
     elif mode == "RAG":
         max_chunks = min(MAX_RETRIEVED_CHUNKS, max(1, context_size // 1_024))
         retrieved_chunks = retrieve_document_chunks(
